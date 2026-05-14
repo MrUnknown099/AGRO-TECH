@@ -31,7 +31,7 @@ const getCurrentWeather = async (req, res) => {
         if (temp < 4) {
             alerts.push("⚠️ Frost warning: Protect sensitive crops overnight.");
         }
-        if (weatherCondition.toLowerCase().includes('rain') || weather.toLowerCase().includes('storm')) {
+        if (weatherCondition.toLowerCase().includes('rain') || weatherCondition.toLowerCase().includes('storm')) {
             alerts.push("⚠️ Heavy rain alert: Pause irrigation and check drainage.");
         }
 
