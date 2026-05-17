@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 // ─── TRANSLATIONS ───────────────────────────────────────────────────────────
 const T = {
@@ -762,13 +762,23 @@ export default function App() {
   ]);
 
   // Market
-  const [market, setMarket] = useState([
-    { id:1, emoji:"🌾", name:"Wheat", nameh:"गेहूँ", price:"245", change:"+2.1%", up:true },
-    { id:2, emoji:"🌽", name:"Corn", nameh:"मक्का", price:"178", change:"-0.8%", up:false },
-    { id:3, emoji:"🥕", name:"Carrots", nameh:"गाजर", price:"89", change:"+5.3%", up:true },
-    { id:4, emoji:"🍅", name:"Tomato", nameh:"टमाटर", price:"320", change:"+1.2%", up:true },
-    { id:5, emoji:"🌻", name:"Sunflower", nameh:"सूरजमुखी", price:"198", change:"-1.4%", up:false },
-  ]);
+  const [market, setMarket] = useState(() => {
+    const saved = localStorage.getItem("agroMarketData");
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return [
+      { id:1, emoji:"🌾", name:"Wheat", nameh:"गेहूँ", price:"245", change:"+2.1%", up:true },
+      { id:2, emoji:"🌽", name:"Corn", nameh:"मक्का", price:"178", change:"-0.8%", up:false },
+      { id:3, emoji:"🥕", name:"Carrots", nameh:"गाजर", price:"89", change:"+5.3%", up:true },
+      { id:4, emoji:"🍅", name:"Tomato", nameh:"टमाटर", price:"320", change:"+1.2%", up:true },
+      { id:5, emoji:"🌻", name:"Sunflower", nameh:"सूरजमुखी", price:"198", change:"-1.4%", up:false },
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("agroMarketData", JSON.stringify(market));
+  }, [market]);
 
   // Fields (for map)
   const [fields, setFields] = useState([

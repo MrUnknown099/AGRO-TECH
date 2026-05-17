@@ -187,12 +187,39 @@ export default function AgroTechDashboard() {
   const [tick, setTick] = useState(0);
   const scrollRef = useRef(null);
 
+  const [cityInput, setCityInput] = useState("Nashik");
+  const [weatherData, setWeatherData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
+    fetchWeather("Nashik");
     const t = setInterval(() => setTick(x => x + 1), 3000);
     return () => clearInterval(t);
   }, []);
 
-  const alerts = alertsData.filter(a => !dismissed.includes(a.id));
+  const fetchWeather = async (city) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`https://agro-tech-qfuy.onrender.com/api/weather/current?city=${encodeURIComponent(city)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setWeatherData(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setLoading(false);
+  };
+
+  const dynamicAlerts = weatherData?.smart_alerts?.length > 0 
+    ? weatherData.smart_alerts.map((text, i) => ({
+        id: 100 + i, type: "alert", icon: "alert", title: "Smart Alert", titleHi: "स्मार्ट अलर्ट",
+        desc: text, descHi: text, severity: "High", color: "#F97316", bg: "rgba(249,115,22,0.12)",
+        border: "#F97316", cta: "Take Action", time: "Just now"
+      }))
+    : alertsData;
+
+  const alerts = dynamicAlerts.filter(a => !dismissed.includes(a.id));
 
   const css = `
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
@@ -288,13 +315,26 @@ export default function AgroTechDashboard() {
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
                       <Icon d={icons.map} size={13} color="rgba(134,239,172,0.6)" />
-                      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>Nashik, Maharashtra</span>
+                      <form onSubmit={e => { e.preventDefault(); fetchWeather(cityInput); }}>
+                        <input 
+                          type="text" 
+                          value={cityInput}
+                          onChange={e => setCityInput(e.target.value)}
+                          onBlur={() => fetchWeather(cityInput)}
+                          style={{ background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: 13, fontWeight: 500, outline: "none", width: 140 }}
+                        />
+                      </form>
+                      {loading && <span style={{fontSize: 10}}>...</span>}
                     </div>
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 4 }}>
-                      <span style={{ fontSize: 76, fontWeight: 300, lineHeight: 1, letterSpacing: "-4px", background: "linear-gradient(160deg, #ffffff 60%, rgba(134,239,172,0.7) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>24</span>
+                      <span style={{ fontSize: 76, fontWeight: 300, lineHeight: 1, letterSpacing: "-4px", background: "linear-gradient(160deg, #ffffff 60%, rgba(134,239,172,0.7) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                        {weatherData ? Math.round(weatherData.temperature) : "24"}
+                      </span>
                       <span style={{ fontSize: 28, fontWeight: 300, marginTop: 12, color: "rgba(255,255,255,0.6)" }}>°C</span>
                     </div>
-                    <div style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 4, fontWeight: 400 }}>Partly Cloudy · Feels 26°C</div>
+                    <div style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 4, fontWeight: 400, textTransform: "capitalize" }}>
+                      {weatherData ? weatherData.description : "Partly Cloudy"}
+                    </div>
                   </div>
                   <div className="float-anim" style={{ marginTop: 8 }}>
                     <AnimatedSun />
@@ -304,9 +344,9 @@ export default function AgroTechDashboard() {
                 {/* Metrics row */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginTop: 20 }}>
                   {[
-                    { icon: icons.droplets, label: "Humidity", value: "68%", color: "#60A5FA" },
-                    { icon: icons.wind, label: "Wind", value: "12km/h", color: "#A78BFA" },
-                    { icon: icons.rain, label: "Rain", value: "45%", color: "#38BDF8" },
+                    { icon: icons.droplets, label: "Humidity", value: weatherData ? `${weatherData.humidity}%` : "68%", color: "#60A5FA" },
+                    { icon: icons.wind, label: "Wind", value: weatherData ? `${weatherData.wind_speed}km/h` : "12km/h", color: "#A78BFA" },
+                    { icon: icons.rain, label: "Rain", value: "0%", color: "#38BDF8" },
                     { icon: icons.uv, label: "UV Index", value: "5 Mod", color: "#FCD34D" },
                   ].map((m, i) => (
                     <div key={i} style={{ background: "rgba(255,255,255,0.05)", borderRadius: 14, padding: "10px 8px", textAlign: "center", border: "1px solid rgba(255,255,255,0.06)" }}>
