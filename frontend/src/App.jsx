@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-
+import WeatherDashboard from "./WeatherDashboard";
+import MandiDashboard from "./MandiDashboard";
+import CropAnalysis from "./CropAnalysis";
 // ─── TRANSLATIONS ───────────────────────────────────────────────────────────
 const T = {
   en: {
@@ -861,8 +863,8 @@ export default function App() {
             <button className={`lang-btn ${lang==="hi"?"active":""}`} onClick={()=>setLang("hi")}>🇮🇳 हिंदी</button>
           </div>
           <div className="screen-nav">
-            {[{id:"login",label:"🔑"},{id:"home",label:"🏠"},{id:"dashboard",label:"📊"}].map(s=>(
-              <button key={s.id} className={`nav-btn ${screen===s.id?"active":""}`} onClick={()=>setScreen(s.id)}>{s.label} {s.id==="login"?"Login":s.id==="home"?t.home:t.dashboard}</button>
+            {[{id:"login",label:"🔑"},{id:"home",label:"🏠"},{id:"dashboard",label:"📊"}, {id:"weather",label:"🌦️"}, {id:"mandi",label:"🛒"}, {id:"crop",label:"🌾"}].map(s=>(
+              <button key={s.id} className={`nav-btn ${screen===s.id?"active":""}`} onClick={()=>setScreen(s.id)}>{s.label}</button>
             ))}
           </div>
         </div>
@@ -963,7 +965,12 @@ export default function App() {
                       {icon:"💊",en:"Crop Care",hi:"फसल देखभाल",bg:"#E8F8E8"},
                       {icon:"📋",en:"Tasks",hi:"कार्य",bg:"#F0E8F8"},
                     ].map((a,i)=>(
-                      <div className="qa-item" key={i} onClick={()=>{ if(a.en==="Tasks") setScreen("dashboard"); }}>
+                      <div className="qa-item" key={i} onClick={()=>{ 
+                        if(a.en==="Tasks") setScreen("dashboard"); 
+                        else if(a.en==="Forecast") setScreen("weather");
+                        else if(a.en==="Markets") setScreen("mandi");
+                        else if(a.en==="My Fields" || a.en==="Soil Data" || a.en==="Crop Care" || a.en==="Pest Alert") setScreen("crop");
+                      }}>
                         <div className="qa-icon" style={{background:a.bg}}>{a.icon}</div>
                         <div className="qa-label">{lang==="hi"?a.hi:a.en}</div>
                       </div>
@@ -997,8 +1004,8 @@ export default function App() {
               </div>
 
               <div className="bottom-nav">
-                {[{icon:"🏠",en:"Home",hi:"होम",s:"home"},{icon:"🌾",en:"Fields",hi:"खेत",s:"fields"},{icon:"📊",en:"Dashboard",hi:"डैशबोर्ड",s:"dashboard"},{icon:"🛒",en:"Market",hi:"बाज़ार",s:"market"},{icon:"👤",en:"Profile",hi:"प्रोफाइल",s:"profile"}].map(n=>(
-                  <div key={n.s} className={`bnav-item ${screen===n.s?"active":""}`} onClick={()=>n.s!=="fields"&&n.s!=="market"&&n.s!=="profile"?setScreen(n.s):null}>
+                {[{icon:"🏠",en:"Home",hi:"होम",s:"home"},{icon:"🌦️",en:"Weather",hi:"मौसम",s:"weather"},{icon:"🌾",en:"Crop",hi:"फसल",s:"crop"},{icon:"🛒",en:"Market",hi:"बाज़ार",s:"mandi"},{icon:"📊",en:"Dash",hi:"डैश",s:"dashboard"}].map(n=>(
+                  <div key={n.s} className={`bnav-item ${screen===n.s?"active":""}`} onClick={()=>setScreen(n.s)}>
                     <div className="bnav-icon">{n.icon}</div>
                     <div className="bnav-label">{lang==="hi"?n.hi:n.en}</div>
                   </div>
@@ -1107,13 +1114,33 @@ export default function App() {
               </div>
 
               <div className="bottom-nav">
-                {[{icon:"🏠",en:"Home",hi:"होम",s:"home"},{icon:"🌾",en:"Fields",hi:"खेत",s:"fields"},{icon:"📊",en:"Dashboard",hi:"डैशबोर्ड",s:"dashboard"},{icon:"🛒",en:"Market",hi:"बाज़ार",s:"market"},{icon:"👤",en:"Profile",hi:"प्रोफाइल",s:"profile"}].map(n=>(
-                  <div key={n.s} className={`bnav-item ${screen===n.s?"active":""}`} onClick={()=>n.s==="home"||n.s==="dashboard"?setScreen(n.s):null}>
+                {[{icon:"🏠",en:"Home",hi:"होम",s:"home"},{icon:"🌦️",en:"Weather",hi:"मौसम",s:"weather"},{icon:"🌾",en:"Crop",hi:"फसल",s:"crop"},{icon:"🛒",en:"Market",hi:"बाज़ार",s:"mandi"},{icon:"📊",en:"Dash",hi:"डैश",s:"dashboard"}].map(n=>(
+                  <div key={n.s} className={`bnav-item ${screen===n.s?"active":""}`} onClick={()=>setScreen(n.s)}>
                     <div className="bnav-icon">{n.icon}</div>
                     <div className="bnav-label">{lang==="hi"?n.hi:n.en}</div>
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* ── NEW SCREENS ─────────────────────────── */}
+          {screen==="weather" && (
+            <div style={{width: '100%', height: '100%', minHeight: '780px', overflowY: 'auto', background: 'white', position: 'relative'}}>
+               <WeatherDashboard />
+               <button onClick={() => setScreen("home")} style={{position: 'absolute', top: 16, left: 16, zIndex: 1000, background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 20, cursor: 'pointer'}}>←</button>
+            </div>
+          )}
+          {screen==="mandi" && (
+            <div style={{width: '100%', height: '100%', minHeight: '780px', overflowY: 'auto', background: 'white', position: 'relative'}}>
+               <MandiDashboard />
+               <button onClick={() => setScreen("home")} style={{position: 'absolute', top: 16, left: 16, zIndex: 1000, background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 20, cursor: 'pointer'}}>←</button>
+            </div>
+          )}
+          {screen==="crop" && (
+            <div style={{width: '100%', height: '100%', minHeight: '780px', overflowY: 'auto', background: 'white', position: 'relative'}}>
+               <CropAnalysis />
+               <button onClick={() => setScreen("home")} style={{position: 'absolute', top: 16, left: 16, zIndex: 1000, background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 20, cursor: 'pointer'}}>←</button>
             </div>
           )}
 
@@ -1359,39 +1386,50 @@ function ProfileModal({t, lang, data, onSave, onClose}) {
 
 // ─── WEATHER MODAL ────────────────────────────────────────────────────────────
 function WeatherModal({t, lang, data, onSave, onClose}) {
-  const [form, setForm] = useState(data);
+  const [loc, setLoc] = useState(data.loc || "");
+  const [loading, setLoading] = useState(false);
+
+  const handleFetchAndSave = async () => {
+    if (!loc) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`https://agro-tech-qfuy.onrender.com/api/weather/current?city=${encodeURIComponent(loc)}`);
+      if (res.ok) {
+        const weatherData = await res.json();
+        // Update data using real values
+        onSave({
+          ...data,
+          loc: weatherData.city,
+          temp: Math.round(weatherData.temperature),
+          desc: weatherData.condition,
+          desch: weatherData.condition, // Can map this if needed
+          humidity: weatherData.humidity,
+          wind: Math.round(weatherData.wind_speed * 3.6) // m/s to km/h
+        });
+      } else {
+        alert("City not found or API error");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error fetching weather");
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div className="modal-sheet">
         <div className="modal-handle"/>
-        <div className="modal-title">⛅ {lang==="hi"?"मौसम संपादित करें":"Edit Weather"}</div>
+        <div className="modal-title">⛅ {lang==="hi"?"स्थान बदलें":"Change Location"}</div>
         <div className="form-group">
-          <label className="form-label">{lang==="hi"?"तापमान (°C)":"Temperature (°C)"}</label>
-          <input className="form-input" type="number" value={form.temp} onChange={e=>setForm(f=>({...f,temp:e.target.value}))}/>
-        </div>
-        <div className="form-group">
-          <label className="form-label">{lang==="hi"?"मौसम विवरण (English)":"Weather Description (English)"}</label>
-          <input className="form-input" value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))} placeholder="e.g. Partly Cloudy"/>
-        </div>
-        <div className="form-group">
-          <label className="form-label">{lang==="hi"?"मौसम विवरण (हिंदी)":"Weather Description (Hindi)"}</label>
-          <input className="form-input" value={form.desch||""} onChange={e=>setForm(f=>({...f,desch:e.target.value}))} placeholder="जैसे आंशिक बादल"/>
-        </div>
-        <div className="form-group">
-          <label className="form-label">{t.location}</label>
-          <input className="form-input" value={form.loc} onChange={e=>setForm(f=>({...f,loc:e.target.value}))} placeholder="Village, District"/>
-        </div>
-        <div className="form-group">
-          <label className="form-label">{lang==="hi"?"नमी (%)":"Humidity (%)"}</label>
-          <input className="form-input" type="number" value={form.humidity} onChange={e=>setForm(f=>({...f,humidity:e.target.value}))}/>
-        </div>
-        <div className="form-group">
-          <label className="form-label">{lang==="hi"?"हवा (km/h)":"Wind Speed (km/h)"}</label>
-          <input className="form-input" type="number" value={form.wind} onChange={e=>setForm(f=>({...f,wind:e.target.value}))}/>
+          <label className="form-label">{lang==="hi"?"शहर/स्थान":"City / Location"}</label>
+          <input className="form-input" value={loc} onChange={e=>setLoc(e.target.value)} placeholder="e.g. Nashik" onKeyDown={e=>e.key==="Enter"&&handleFetchAndSave()}/>
         </div>
         <div className="modal-btns">
           <button className="btn-secondary" onClick={onClose}>{t.cancel}</button>
-          <button className="btn-primary" onClick={()=>onSave(form)}>✅ {t.save}</button>
+          <button className="btn-primary" onClick={handleFetchAndSave} disabled={loading}>
+            {loading ? "⌛..." : `✅ ${lang==="hi"?"अपडेट करें":"Update"}`}
+          </button>
         </div>
       </div>
     </div>

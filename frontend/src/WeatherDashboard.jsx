@@ -296,6 +296,23 @@ export default function AgroTechDashboard() {
             </div>
           </div>
 
+          {/* ── Search Bar ── */}
+          <div style={{ margin: "0 16px 20px", display: "flex", gap: 8 }}>
+            <input 
+              value={cityInput}
+              onChange={(e) => setCityInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && fetchWeather(cityInput)}
+              placeholder="Enter city or state..."
+              style={{ flex: 1, ...glass, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "12px 16px", color: "white", fontSize: 15, outline: "none" }}
+            />
+            <button 
+              onClick={() => fetchWeather(cityInput)}
+              style={{ ...glass, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "0 16px", color: "white", cursor: "pointer", fontWeight: 600 }}
+            >
+              Search
+            </button>
+          </div>
+
           {/* ── Main Weather Card ── */}
           <div style={{ margin: "0 16px", marginBottom: 16 }}>
             <div className="card-hover" style={{
@@ -386,7 +403,7 @@ export default function AgroTechDashboard() {
             <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 12 }}>Smart Alerts</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {alerts.map(a => (
-                <div key={a.id} className="alert-slide card-hover" style={{ background: a.bg, border: \`1px solid \${a.border}\`, borderRadius: 16, padding: 16, display: "flex", gap: 14 }}>
+                <div key={a.id} className="alert-slide card-hover" style={{ background: a.bg, border: `1px solid ${a.border}`, borderRadius: 16, padding: 16, display: "flex", gap: 14 }}>
                   <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <Icon d={a.icon} color={a.color} size={20} />
                   </div>
